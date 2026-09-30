@@ -6,7 +6,9 @@ import com.example.student.entity.Student;
 import com.example.student.exception.StudentNotFoundException;
 import com.example.student.mapper.StudentMapper;
 import com.example.student.repository.StudentRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
 
 import java.util.List;
 
@@ -15,12 +17,17 @@ public class StudentServiceImpl implements StudentService {
 
     private final StudentRepository studentRepository;
     private final StudentMapper studentMapper;
+    private final RestClient restClient;
+
+    @Value("${services.enrollment.url:http://localhost:8083}")
+    private String enrollmentServiceUrl;
 
     public StudentServiceImpl(
             StudentRepository studentRepository,
             StudentMapper studentMapper) {
         this.studentRepository = studentRepository;
         this.studentMapper = studentMapper;
+        this.restClient = RestClient.create();
     }
 
     @Override
@@ -79,5 +86,17 @@ public class StudentServiceImpl implements StudentService {
                         "Student not found with id: " + id));
 
         studentRepository.delete(student);
+
+        // Cascade delete enrollments for this student
+        try {
+            System.out.println("Calling Enrollment service to cascade delete for student ID: " + id);
+            restClient.delete()
+                    .uri(enrollmentServiceUrl + "/api/enrollments/student/{studentId}", id)
+                    .retrieve()
+                    .toBodilessEntity();
+            System.out.println("Successfully notified Enrollment service.");
+        } catch (Exception e) {
+            System.err.println("Could not notify Enrollment service: " + e.getMessage());
+        }
     }
 }

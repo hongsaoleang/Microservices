@@ -66,4 +66,24 @@ public class EnrollmentController {
 
         return ResponseEntity.noContent().build();
     }
-}
+
+    @DeleteMapping("/student/{studentId}")
+    public ResponseEntity<Void> deleteEnrollmentsByStudentId(
+            @PathVariable Long studentId) {
+
+        System.out.println("Enrollment Service: Deleting all enrollments for student ID: " + studentId);
+        enrollmentService.deleteEnrollmentsByStudentId(studentId);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/course/{courseId}")
+    public ResponseEntity<Void> deleteEnrollmentsByCourseId(
+            @PathVariable Long courseId) {
+
+        System.out.println("Enrollment Service: Deleting all enrollments for course ID: " + courseId);
+        enrollmentService.deleteEnrollmentsByCourseId(courseId);
+
+        return ResponseEntity.noContent().build();
+    }
+}

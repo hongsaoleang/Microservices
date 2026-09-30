@@ -19,4 +19,8 @@ public interface EnrollmentService {
             EnrollmentRequest request);
 
     void deleteEnrollment(Long id);
+
+    void deleteEnrollmentsByStudentId(Long studentId);
+
+    void deleteEnrollmentsByCourseId(Long courseId);
 }
